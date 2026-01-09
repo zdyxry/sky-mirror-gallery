@@ -5,6 +5,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
 import { useState } from 'react';
 import { extractTag } from './TagFilter';
+import { MediaLightbox } from './MediaLightbox';
 
 interface PostCardProps {
   post: BlueskyPost;
@@ -14,6 +15,9 @@ interface PostCardProps {
 
 export function PostCard({ post, index, onTagClick }: PostCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxType, setLightboxType] = useState<'image' | 'video'>('image');
+  const [initialImageIndex, setInitialImageIndex] = useState(0);
   
   const embed = post.embed;
   const hasImages = embed?.$type === 'app.bsky.embed.images#view' && embed.images;
@@ -33,6 +37,17 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
     ? post.record.text?.replace(/^[（(][一-龥][）)]/, '').trim() 
     : post.record.text;
 
+  const openImageLightbox = (index: number) => {
+    setInitialImageIndex(index);
+    setLightboxType('image');
+    setLightboxOpen(true);
+  };
+
+  const openVideoLightbox = () => {
+    setLightboxType('video');
+    setLightboxOpen(true);
+  };
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 20 }}
@@ -46,7 +61,8 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
           {embed.images.slice(0, 4).map((image, imgIndex) => (
             <div 
               key={imgIndex}
-              className="relative overflow-hidden bg-secondary aspect-square"
+              className="relative overflow-hidden bg-secondary aspect-square cursor-pointer"
+              onClick={() => openImageLightbox(imgIndex)}
             >
               <img
                 src={image.thumb}
@@ -59,6 +75,8 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
                 onLoad={() => setImageLoaded(true)}
                 loading="lazy"
               />
+              {/* Hover overlay */}
+              <div className="absolute inset-0 bg-background/0 group-hover:bg-background/10 transition-colors" />
             </div>
           ))}
         </div>
@@ -66,15 +84,18 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
 
       {/* Video */}
       {hasVideo && embed.thumbnail && (
-        <div className="relative aspect-video bg-secondary overflow-hidden">
+        <div 
+          className="relative aspect-video bg-secondary overflow-hidden cursor-pointer"
+          onClick={openVideoLightbox}
+        >
           <img
             src={embed.thumbnail}
             alt="Video thumbnail"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
           />
-          <div className="absolute inset-0 flex items-center justify-center bg-background/30">
-            <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center bg-background/30 group-hover:bg-background/40 transition-colors">
+            <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center group-hover:scale-110 transition-transform">
               <Play className="w-7 h-7 text-primary-foreground ml-1" fill="currentColor" />
             </div>
           </div>
@@ -148,6 +169,16 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
           </div>
         </div>
       </div>
+
+      {/* Media Lightbox */}
+      <MediaLightbox
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        type={lightboxType}
+        images={hasImages && embed.images ? embed.images : []}
+        initialIndex={initialImageIndex}
+        videoUrl={hasVideo ? embed.playlist : undefined}
+      />
     </motion.article>
   );
 }
