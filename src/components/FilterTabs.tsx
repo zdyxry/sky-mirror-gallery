@@ -22,7 +22,7 @@ const filters: { value: ContentFilter; label: string; icon: React.ReactNode }[] 
 
 export function FilterTabs({ activeFilter, onFilterChange, counts }: FilterTabsProps) {
   return (
-    <div className="flex items-center justify-center gap-1 sm:gap-2 p-1 glass-card rounded-full w-full sm:w-auto sm:max-w-fit mx-auto">
+    <div className="flex items-center justify-center gap-1 sm:gap-2 p-1 glass-card rounded-full flex-1 sm:flex-none sm:max-w-fit">
       {filters.map((filter) => {
         const count = counts[filter.value];
         const isActive = activeFilter === filter.value;

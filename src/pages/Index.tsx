@@ -46,9 +46,9 @@ const Index = () => {
       <ProfileHeader profile={profile} isLoading={profileLoading} />
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Filter & Refresh */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+        <div className="flex items-center justify-between gap-2 sm:gap-4 mb-6">
           <FilterTabs 
             activeFilter={filter} 
             onFilterChange={setFilter}
