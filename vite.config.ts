@@ -17,8 +17,8 @@ export default defineConfig(({ mode }) => ({
       registerType: "autoUpdate",
       includeAssets: ["favicon.jpg", "robots.txt"],
       manifest: {
-        name: "蓝天日记",
-        short_name: "蓝天日记",
+        name: "Decaocto",
+        short_name: "Decaocto",
         description: "自动同步 Bluesky 内容的个人主页",
         theme_color: "#0ea5e9",
         background_color: "#0f172a",
