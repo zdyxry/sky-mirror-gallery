@@ -1,73 +1,47 @@
-# Welcome to your Lovable project
+# 蓝天日记
 
-## Project info
+一个自动同步 Bluesky 内容的个人主页应用，展示 [@cshuamy.bsky.social](https://bsky.app/profile/cshuamy.bsky.social) 的动态。
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## ✨ 功能特性
 
-## How can I edit this code?
+- 🔄 **自动同步** - 实时抓取 Bluesky 账号的最新内容
+- 📷 **多媒体支持** - 支持文字、图片和视频内容展示
+- 🎨 **瀑布流布局** - Pinterest 风格的卡片式布局
+- ♾️ **无限滚动** - 滚动到底部自动加载更多内容
+- 🏷️ **内容过滤** - 按类型（全部/仅图片/仅视频）和标签筛选
+- 📱 **移动端优化** - 响应式设计，完美适配手机屏幕
+- 📲 **PWA 支持** - 可添加到手机主屏幕，支持离线缓存
 
-There are several ways of editing your application.
+## 🛠️ 技术栈
 
-**Use Lovable**
+- **框架**: React 18 + TypeScript
+- **构建工具**: Vite
+- **样式**: Tailwind CSS
+- **UI 组件**: shadcn/ui
+- **数据请求**: TanStack Query
+- **动画**: Framer Motion
+- **PWA**: vite-plugin-pwa
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## 🚀 本地开发
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+```bash
+# 克隆项目
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# 进入目录
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# 安装依赖
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# 启动开发服务器
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## 📦 部署
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+在 [Lovable](https://lovable.dev) 中点击 Share → Publish 即可发布。
 
-**Use GitHub Codespaces**
+## 📄 许可
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+MIT License
