@@ -15,9 +15,9 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "robots.txt"],
+      includeAssets: ["favicon.jpg", "robots.txt"],
       manifest: {
-        name: "Bluesky Feed Viewer",
+        name: "蓝天日记",
         short_name: "蓝天日记",
         description: "自动同步 Bluesky 内容的个人主页",
         theme_color: "#0ea5e9",
@@ -27,19 +27,14 @@ export default defineConfig(({ mode }) => ({
         start_url: "/",
         icons: [
           {
-            src: "/pwa-192x192.png",
-            sizes: "192x192",
-            type: "image/png",
+            src: "/favicon.jpg",
+            sizes: "512x512",
+            type: "image/jpeg",
           },
           {
-            src: "/pwa-512x512.png",
+            src: "/favicon.jpg",
             sizes: "512x512",
-            type: "image/png",
-          },
-          {
-            src: "/pwa-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
+            type: "image/jpeg",
             purpose: "maskable",
           },
         ],
