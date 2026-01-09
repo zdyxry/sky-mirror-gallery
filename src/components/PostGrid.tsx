@@ -3,11 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { BlueskyPost, ContentFilter } from '@/types/bluesky';
 import { PostCard } from './PostCard';
 import { Skeleton } from '@/components/ui/skeleton';
+import { extractTag } from './TagFilter';
 
 interface PostGridProps {
   posts: BlueskyPost[];
   filter: ContentFilter;
+  selectedTags: string[];
   isLoading: boolean;
+  onTagClick: (tag: string) => void;
 }
 
 function getPostType(post: BlueskyPost): 'text' | 'images' | 'videos' {
@@ -17,11 +20,25 @@ function getPostType(post: BlueskyPost): 'text' | 'images' | 'videos' {
   return 'text';
 }
 
-export function PostGrid({ posts, filter, isLoading }: PostGridProps) {
+export function PostGrid({ posts, filter, selectedTags, isLoading, onTagClick }: PostGridProps) {
   const filteredPosts = useMemo(() => {
-    if (filter === 'all') return posts;
-    return posts.filter((post) => getPostType(post) === filter);
-  }, [posts, filter]);
+    let result = posts;
+    
+    // 内容类型筛选
+    if (filter !== 'all') {
+      result = result.filter((post) => getPostType(post) === filter);
+    }
+    
+    // 标签筛选（多选，或的关系）
+    if (selectedTags.length > 0) {
+      result = result.filter((post) => {
+        const tag = extractTag(post.record.text || '');
+        return tag && selectedTags.includes(tag);
+      });
+    }
+    
+    return result;
+  }, [posts, filter, selectedTags]);
 
   if (isLoading) {
     return (
@@ -59,7 +76,7 @@ export function PostGrid({ posts, filter, isLoading }: PostGridProps) {
       >
         {filteredPosts.map((post, index) => (
           <div key={post.uri} className="break-inside-avoid">
-            <PostCard post={post} index={index} />
+            <PostCard post={post} index={index} onTagClick={onTagClick} />
           </div>
         ))}
       </motion.div>
