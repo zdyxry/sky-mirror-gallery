@@ -5,10 +5,10 @@ export function BackgroundEffects() {
     <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
       {/* Gradient orbs */}
       <motion.div
-        className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-primary/10 blur-3xl"
+        className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-primary/20 blur-3xl"
         animate={{
           scale: [1, 1.2, 1],
-          opacity: [0.3, 0.5, 0.3],
+          opacity: [0.2, 0.35, 0.2],
         }}
         transition={{
           duration: 8,
@@ -17,10 +17,10 @@ export function BackgroundEffects() {
         }}
       />
       <motion.div
-        className="absolute top-1/2 -left-40 w-80 h-80 rounded-full bg-primary/5 blur-3xl"
+        className="absolute top-1/2 -left-40 w-80 h-80 rounded-full bg-primary/10 blur-3xl"
         animate={{
           scale: [1, 1.3, 1],
-          opacity: [0.2, 0.4, 0.2],
+          opacity: [0.15, 0.25, 0.15],
         }}
         transition={{
           duration: 10,
@@ -30,10 +30,10 @@ export function BackgroundEffects() {
         }}
       />
       <motion.div
-        className="absolute bottom-20 right-1/4 w-64 h-64 rounded-full bg-accent/10 blur-3xl"
+        className="absolute bottom-20 right-1/4 w-64 h-64 rounded-full bg-accent/15 blur-3xl"
         animate={{
           scale: [1, 1.15, 1],
-          opacity: [0.2, 0.35, 0.2],
+          opacity: [0.15, 0.25, 0.15],
         }}
         transition={{
           duration: 7,
