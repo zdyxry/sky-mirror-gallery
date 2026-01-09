@@ -12,8 +12,8 @@ export function ProfileHeader({ profile, isLoading }: ProfileHeaderProps) {
   if (isLoading) {
     return (
       <div className="relative">
-        <Skeleton className="h-32 sm:h-48 w-full rounded-none" />
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 -mt-10 sm:-mt-16 relative z-10">
+        <Skeleton className="h-24 sm:h-48 w-full rounded-none" />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 -mt-8 sm:-mt-16 relative z-10">
           <div className="flex items-end sm:items-start gap-4 sm:gap-6">
             <Skeleton className="w-20 h-20 sm:w-32 sm:h-32 rounded-full border-4 border-background shrink-0" />
             <div className="flex-1 pb-2 sm:pt-4 space-y-2 sm:space-y-3">
@@ -32,7 +32,7 @@ export function ProfileHeader({ profile, isLoading }: ProfileHeaderProps) {
   return (
     <div className="relative">
       {/* Banner */}
-      <div className="h-32 sm:h-48 bg-gradient-to-br from-primary/30 via-secondary to-background overflow-hidden">
+      <div className="h-24 sm:h-48 bg-gradient-to-br from-primary/30 via-secondary to-background overflow-hidden">
         {profile.banner && (
           <img 
             src={profile.banner} 
@@ -44,7 +44,7 @@ export function ProfileHeader({ profile, isLoading }: ProfileHeaderProps) {
       </div>
 
       {/* Profile Info */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 -mt-10 sm:-mt-16 relative z-10">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 -mt-8 sm:-mt-16 relative z-10">
         <motion.div 
           className="flex items-end sm:items-start gap-4 sm:gap-6"
           initial={{ opacity: 0, y: 20 }}
