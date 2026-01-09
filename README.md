@@ -1,4 +1,4 @@
-# Deka okto
+# Decaocto
 
 一个自动同步 Bluesky 内容的个人主页应用，展示 [@cshuamy.bsky.social](https://bsky.app/profile/cshuamy.bsky.social) 的动态。
 
