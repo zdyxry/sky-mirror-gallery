@@ -1,9 +1,10 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { BlueskyPost, ContentFilter } from '@/types/bluesky';
 import { PostCard } from './PostCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { extractTag } from './TagFilter';
+import { Loader2 } from 'lucide-react';
 
 interface PostGridProps {
   posts: BlueskyPost[];
@@ -11,6 +12,9 @@ interface PostGridProps {
   selectedTags: string[];
   isLoading: boolean;
   onTagClick: (tag: string) => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
+  onLoadMore?: () => void;
 }
 
 function getPostType(post: BlueskyPost): 'text' | 'images' | 'videos' {
@@ -20,7 +24,18 @@ function getPostType(post: BlueskyPost): 'text' | 'images' | 'videos' {
   return 'text';
 }
 
-export function PostGrid({ posts, filter, selectedTags, isLoading, onTagClick }: PostGridProps) {
+export function PostGrid({ 
+  posts, 
+  filter, 
+  selectedTags, 
+  isLoading, 
+  onTagClick,
+  hasNextPage,
+  isFetchingNextPage,
+  onLoadMore 
+}: PostGridProps) {
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
   const filteredPosts = useMemo(() => {
     let result = posts;
     
@@ -39,6 +54,28 @@ export function PostGrid({ posts, filter, selectedTags, isLoading, onTagClick }:
     
     return result;
   }, [posts, filter, selectedTags]);
+
+  // 无限滚动检测
+  const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
+    const [target] = entries;
+    if (target.isIntersecting && hasNextPage && !isFetchingNextPage && onLoadMore) {
+      onLoadMore();
+    }
+  }, [hasNextPage, isFetchingNextPage, onLoadMore]);
+
+  useEffect(() => {
+    const element = loadMoreRef.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(handleObserver, {
+      root: null,
+      rootMargin: '100px',
+      threshold: 0,
+    });
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [handleObserver]);
 
   if (isLoading) {
     return (
@@ -80,6 +117,19 @@ export function PostGrid({ posts, filter, selectedTags, isLoading, onTagClick }:
           </div>
         ))}
       </motion.div>
+      
+      {/* 加载更多触发器 */}
+      <div ref={loadMoreRef} className="py-8 flex justify-center">
+        {isFetchingNextPage && (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Loader2 className="w-5 h-5 animate-spin" />
+            <span>加载更多...</span>
+          </div>
+        )}
+        {!hasNextPage && posts.length > 0 && (
+          <p className="text-muted-foreground text-sm">已加载全部内容</p>
+        )}
+      </div>
     </AnimatePresence>
   );
 }
