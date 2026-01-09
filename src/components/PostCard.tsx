@@ -4,13 +4,15 @@ import type { BlueskyPost } from '@/types/bluesky';
 import { formatDistanceToNow } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
 import { useState } from 'react';
+import { extractTag } from './TagFilter';
 
 interface PostCardProps {
   post: BlueskyPost;
   index: number;
+  onTagClick?: (tag: string) => void;
 }
 
-export function PostCard({ post, index }: PostCardProps) {
+export function PostCard({ post, index, onTagClick }: PostCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   
   const embed = post.embed;
@@ -24,6 +26,12 @@ export function PostCard({ post, index }: PostCardProps) {
     addSuffix: true,
     locale: zhCN,
   });
+
+  // 提取标签和处理后的文本
+  const tag = extractTag(post.record.text || '');
+  const displayText = tag 
+    ? post.record.text?.replace(/^[（(][一-龥][）)]/, '').trim() 
+    : post.record.text;
 
   return (
     <motion.article
@@ -93,10 +101,20 @@ export function PostCard({ post, index }: PostCardProps) {
 
       {/* Content */}
       <div className="p-4">
+        {/* Tag Badge */}
+        {tag && (
+          <button
+            onClick={() => onTagClick?.(tag)}
+            className="inline-flex items-center px-2 py-0.5 mb-2 rounded-full text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+          >
+            {tag}
+          </button>
+        )}
+        
         {/* Text */}
-        {post.record.text && (
+        {displayText && (
           <p className="text-foreground text-sm sm:text-base leading-relaxed whitespace-pre-wrap mb-4">
-            {post.record.text}
+            {displayText}
           </p>
         )}
 
