@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -62,14 +63,14 @@ export function MediaLightbox({
     setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
   };
 
-  return (
+  const lightboxContent = (
     <AnimatePresence>
       {isOpen && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-background/95 backdrop-blur-sm"
           onClick={onClose}
         >
           {/* Close button */}
@@ -147,4 +148,7 @@ export function MediaLightbox({
       )}
     </AnimatePresence>
   );
+
+  // 使用 Portal 渲染到 body，确保全屏覆盖
+  return createPortal(lightboxContent, document.body);
 }
