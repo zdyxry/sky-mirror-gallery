@@ -12,15 +12,21 @@ const Index = () => {
   const [filter, setFilter] = useState<ContentFilter>('all');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
-  const { data: profile, isLoading: profileLoading } = useBlueskyProfile();
+  const { data: profile, isLoading: profileLoading, refetch: refetchProfile } = useBlueskyProfile();
   const { 
     data, 
     isLoading: feedLoading, 
     isFetching,
     hasNextPage,
     isFetchingNextPage,
-    fetchNextPage 
+    fetchNextPage,
+    refetch: refetchFeed
   } = useBlueskyFeed();
+
+  const handleRefresh = () => {
+    refetchProfile();
+    refetchFeed();
+  };
 
   // 将分页数据展平为帖子数组
   const posts = useMemo(() => {
@@ -54,7 +60,7 @@ const Index = () => {
             onFilterChange={setFilter}
             counts={counts}
           />
-          <RefreshIndicator isFetching={isFetching} />
+          <RefreshIndicator isFetching={isFetching} onRefresh={handleRefresh} />
         </div>
 
         {/* Tag Filter */}
