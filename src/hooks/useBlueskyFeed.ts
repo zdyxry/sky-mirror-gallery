@@ -1,8 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import type { BlueskyProfile, BlueskyPost } from '@/types/bluesky';
 
 const BLUESKY_HANDLE = 'cshuamy.bsky.social';
 const API_BASE = 'https://public.api.bsky.app/xrpc';
+const PAGE_SIZE = 20;
 
 async function fetchProfile(): Promise<BlueskyProfile> {
   const response = await fetch(
@@ -16,33 +17,44 @@ async function fetchProfile(): Promise<BlueskyProfile> {
   return response.json();
 }
 
-async function fetchFeed(): Promise<BlueskyPost[]> {
-  const response = await fetch(
-    `${API_BASE}/app.bsky.feed.getAuthorFeed?actor=${BLUESKY_HANDLE}&limit=50`
-  );
+interface FeedResponse {
+  feed: { post: BlueskyPost }[];
+  cursor?: string;
+}
+
+async function fetchFeedPage(cursor?: string): Promise<FeedResponse> {
+  const url = new URL(`${API_BASE}/app.bsky.feed.getAuthorFeed`);
+  url.searchParams.set('actor', BLUESKY_HANDLE);
+  url.searchParams.set('limit', String(PAGE_SIZE));
+  if (cursor) {
+    url.searchParams.set('cursor', cursor);
+  }
+  
+  const response = await fetch(url.toString());
   
   if (!response.ok) {
     throw new Error('Failed to fetch feed');
   }
   
-  const data = await response.json();
-  return data.feed.map((item: { post: BlueskyPost }) => item.post);
+  return response.json();
 }
 
 export function useBlueskyProfile() {
   return useQuery({
     queryKey: ['bluesky-profile', BLUESKY_HANDLE],
     queryFn: fetchProfile,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchInterval: 10 * 60 * 1000, // Auto-refresh every 10 minutes
+    staleTime: 5 * 60 * 1000,
+    refetchInterval: 10 * 60 * 1000,
   });
 }
 
 export function useBlueskyFeed() {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ['bluesky-feed', BLUESKY_HANDLE],
-    queryFn: fetchFeed,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    refetchInterval: 5 * 60 * 1000, // Auto-refresh every 5 minutes
+    queryFn: ({ pageParam }) => fetchFeedPage(pageParam),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.cursor,
+    staleTime: 2 * 60 * 1000,
+    refetchInterval: 5 * 60 * 1000,
   });
 }

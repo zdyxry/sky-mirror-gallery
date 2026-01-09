@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useBlueskyProfile, useBlueskyFeed } from '@/hooks/useBlueskyFeed';
 import { ProfileHeader } from '@/components/ProfileHeader';
 import { FilterTabs } from '@/components/FilterTabs';
@@ -13,7 +13,20 @@ const Index = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
   const { data: profile, isLoading: profileLoading } = useBlueskyProfile();
-  const { data: posts = [], isLoading: feedLoading, isFetching } = useBlueskyFeed();
+  const { 
+    data, 
+    isLoading: feedLoading, 
+    isFetching,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage 
+  } = useBlueskyFeed();
+
+  // 将分页数据展平为帖子数组
+  const posts = useMemo(() => {
+    if (!data?.pages) return [];
+    return data.pages.flatMap(page => page.feed.map(item => item.post));
+  }, [data]);
 
   const counts = getFilterCounts(posts);
 
@@ -60,6 +73,9 @@ const Index = () => {
           selectedTags={selectedTags}
           isLoading={feedLoading} 
           onTagClick={handleTagClick}
+          hasNextPage={hasNextPage}
+          isFetchingNextPage={isFetchingNextPage}
+          onLoadMore={() => fetchNextPage()}
         />
       </main>
 
