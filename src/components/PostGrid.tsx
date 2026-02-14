@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useRef, useCallback } from 'react';
+import { useMemo, useEffect, useRef, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { BlueskyPost, ContentFilter } from '@/types/bluesky';
 import { PostCard } from './PostCard';
@@ -24,6 +24,34 @@ function getPostType(post: BlueskyPost): 'text' | 'images' | 'videos' {
   return 'text';
 }
 
+function useColumnCount() {
+  const [columnCount, setColumnCount] = useState(1);
+
+  useEffect(() => {
+    const lgQuery = window.matchMedia('(min-width: 1024px)');
+    const smQuery = window.matchMedia('(min-width: 640px)');
+
+    const updateColumns = () => {
+      if (lgQuery.matches) setColumnCount(3);
+      else if (smQuery.matches) setColumnCount(2);
+      else setColumnCount(1);
+    };
+
+    updateColumns();
+
+    // 现代浏览器监听方式
+    lgQuery.addEventListener('change', updateColumns);
+    smQuery.addEventListener('change', updateColumns);
+
+    return () => {
+      lgQuery.removeEventListener('change', updateColumns);
+      smQuery.removeEventListener('change', updateColumns);
+    };
+  }, []);
+
+  return columnCount;
+}
+
 export function PostGrid({ 
   posts, 
   filter, 
@@ -35,6 +63,7 @@ export function PostGrid({
   onLoadMore 
 }: PostGridProps) {
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const columnCount = useColumnCount();
 
   const filteredPosts = useMemo(() => {
     let result = posts;
@@ -77,12 +106,30 @@ export function PostGrid({
     return () => observer.disconnect();
   }, [handleObserver]);
 
+  const columns = useMemo(() => {
+    const cols: { post: BlueskyPost; index: number }[][] = Array.from(
+      { length: columnCount },
+      () => []
+    );
+
+    filteredPosts.forEach((post, index) => {
+      cols[index % columnCount].push({ post, index });
+    });
+
+    return cols;
+  }, [filteredPosts, columnCount]);
+
   if (isLoading) {
     return (
-      <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
-        {Array.from({ length: 9 }).map((_, i) => (
-          <div key={i} className="break-inside-avoid">
-            <Skeleton className={`w-full rounded-xl ${i % 3 === 0 ? 'h-80' : i % 3 === 1 ? 'h-48' : 'h-64'}`} />
+      <div className="flex flex-row gap-4 items-start">
+        {Array.from({ length: columnCount }).map((_, colIdx) => (
+          <div key={colIdx} className="flex-1 flex flex-col gap-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton
+                key={i}
+                className={`w-full rounded-xl ${(colIdx + i) % 3 === 0 ? 'h-80' : (colIdx + i) % 3 === 1 ? 'h-48' : 'h-64'}`}
+              />
+            ))}
           </div>
         ))}
       </div>
@@ -109,11 +156,18 @@ export function PostGrid({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
-        className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4"
+        className="flex flex-row gap-4 items-start"
       >
-        {filteredPosts.map((post, index) => (
-          <div key={post.uri} className="break-inside-avoid">
-            <PostCard post={post} index={index} onTagClick={onTagClick} />
+        {columns.map((col, colIndex) => (
+          <div key={colIndex} className="flex-1 flex flex-col gap-4">
+            {col.map(({ post, index }) => (
+              <PostCard
+                key={post.uri}
+                post={post}
+                index={index}
+                onTagClick={onTagClick}
+              />
+            ))}
           </div>
         ))}
       </motion.div>
