@@ -3,7 +3,7 @@ import type { BlueskyProfile, BlueskyPost } from '@/types/bluesky';
 
 const BLUESKY_HANDLE = 'cshuamy.bsky.social';
 const API_BASE = 'https://public.api.bsky.app/xrpc';
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 100;
 
 async function fetchProfile(): Promise<BlueskyProfile> {
   const response = await fetch(

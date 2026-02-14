@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useBlueskyProfile, useBlueskyFeed } from '@/hooks/useBlueskyFeed';
 import { ProfileHeader } from '@/components/ProfileHeader';
 import { FilterTabs } from '@/components/FilterTabs';
@@ -33,6 +33,18 @@ const Index = () => {
     if (!data?.pages) return [];
     return data.pages.flatMap(page => page.feed.map(item => item.post));
   }, [data]);
+
+  // 自动加载更多内容以获取更多标签，上限为 500 条
+  useEffect(() => {
+    const MAX_AUTO_POSTS = 500;
+    if (hasNextPage && !isFetchingNextPage && posts.length < MAX_AUTO_POSTS) {
+      // 稍微延迟一下，避免与初始加载过于密集
+      const timer = setTimeout(() => {
+        fetchNextPage();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [hasNextPage, isFetchingNextPage, posts.length, fetchNextPage]);
 
   const counts = getFilterCounts(posts);
 
