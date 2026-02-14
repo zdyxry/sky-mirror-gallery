@@ -1,5 +1,6 @@
 import { useMemo, useEffect, useRef, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { MEDIA_QUERIES } from '@/lib/breakpoints';
 import type { BlueskyPost, ContentFilter } from '@/types/bluesky';
 import { PostCard } from './PostCard';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -25,11 +26,16 @@ function getPostType(post: BlueskyPost): 'text' | 'images' | 'videos' {
 }
 
 function useColumnCount() {
-  const [columnCount, setColumnCount] = useState(1);
+  const [columnCount, setColumnCount] = useState(() => {
+    if (typeof window === 'undefined') return 1;
+    if (window.matchMedia(MEDIA_QUERIES.lg).matches) return 3;
+    if (window.matchMedia(MEDIA_QUERIES.sm).matches) return 2;
+    return 1;
+  });
 
   useEffect(() => {
-    const lgQuery = window.matchMedia('(min-width: 1024px)');
-    const smQuery = window.matchMedia('(min-width: 640px)');
+    const lgQuery = window.matchMedia(MEDIA_QUERIES.lg);
+    const smQuery = window.matchMedia(MEDIA_QUERIES.sm);
 
     const updateColumns = () => {
       if (lgQuery.matches) setColumnCount(3);
@@ -37,9 +43,6 @@ function useColumnCount() {
       else setColumnCount(1);
     };
 
-    updateColumns();
-
-    // 现代浏览器监听方式
     lgQuery.addEventListener('change', updateColumns);
     smQuery.addEventListener('change', updateColumns);
 
