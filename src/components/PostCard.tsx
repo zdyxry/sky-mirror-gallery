@@ -52,7 +52,7 @@ export function PostCard({ post, index, onTagClick }: PostCardProps) {
     <motion.article
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05, duration: 0.4 }}
+      transition={{ delay: Math.min(index * 0.05, 0.5), duration: 0.4 }}
       className="glass-card rounded-xl overflow-hidden group hover:shadow-[var(--shadow-hover)] transition-shadow duration-300"
     >
       {/* Images */}
