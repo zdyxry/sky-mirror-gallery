@@ -2,6 +2,13 @@
 
 export type TravelCategory = 'home' | 'domestic' | 'international';
 
+export interface TravelVisit {
+  /** 访问年份 */
+  year: number;
+  /** 访问描述/原因 */
+  description: string;
+}
+
 export interface TravelPlace {
   /** 地点名称 */
   name: string;
@@ -11,20 +18,38 @@ export interface TravelPlace {
   lng: number;
   /** 国家/地区 */
   country: string;
-  /** 首次访问日期 */
-  firstVisitDate?: string;
-  /** 备注/描述 */
-  notes?: string;
   /** 类别：居住地/国内旅行/国际旅行 */
   category: TravelCategory;
+  /** 所有访问记录 */
+  visits: TravelVisit[];
+  /** 备注（可选） */
+  notes?: string;
+}
+
+export interface RawTravelPlace {
+  /** 地点名称 */
+  name: string;
+  /** 国家/地区（可选，帮助提高搜索准确度） */
+  country?: string;
+  /** 类别：居住地/国内旅行/国际旅行 */
+  category: TravelCategory;
+  /** 所有访问记录 */
+  visits: TravelVisit[];
+  /** 备注（可选） */
+  notes?: string;
 }
 
 export interface TravelStats {
   totalPlaces: number;
+  totalVisits: number;
   homeCount: number;
   domesticCount: number;
-  internationalCount;
+  internationalCount: number;
   countries: string[];
+  yearRange: {
+    min: number;
+    max: number;
+  };
 }
 
 export const CATEGORY_COLORS: Record<TravelCategory, string> = {

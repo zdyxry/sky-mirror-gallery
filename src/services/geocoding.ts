@@ -1,20 +1,7 @@
-import type { TravelPlace, TravelCategory } from '@/types/travel';
+import type { TravelPlace, RawTravelPlace } from '@/types/travel';
 
 // 坐标缓存，避免重复请求
 const coordinateCache = new Map<string, { lat: number; lng: number }>();
-
-export interface RawTravelPlace {
-  /** 地点名称 */
-  name: string;
-  /** 国家/地区（可选，帮助提高搜索准确度） */
-  country?: string;
-  /** 首次访问日期 */
-  firstVisitDate?: string;
-  /** 备注/描述 */
-  notes?: string;
-  /** 类别：居住地/国内旅行/国际旅行 */
-  category: TravelCategory;
-}
 
 /**
  * 使用 OpenStreetMap Nominatim API 获取地理坐标
@@ -120,69 +107,6 @@ export async function batchGeocode(
   return results;
 }
 
-/**
- * 同步批量地理编码（用于开发时预获取坐标）
- * 这个函数会按顺序获取所有坐标并返回结果
- */
-export async function prefetchCoordinates(
-  places: RawTravelPlace[]
-): Promise<{ place: RawTravelPlace; coords: { lat: number; lng: number } | null }[]> {
-  const results: { place: RawTravelPlace; coords: { lat: number; lng: number } | null }[] = [];
-
-  for (const place of places) {
-    const coords = await geocodeLocation(place.name, place.country);
-    results.push({ place, coords });
-    
-    // 遵守速率限制
-    await delay(1100);
-  }
-
-  return results;
-}
-
 function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-/**
- * 生成带坐标的 TypeScript 数据文件内容
- * 用于开发时将获取到的坐标保存到文件中
- */
-export function generateTravelDataFile(
-  places: { place: RawTravelPlace; coords: { lat: number; lng: number } | null }[]
-): string {
-  const validPlaces = places.filter(p => p.coords !== null);
-  
-  const placesArray = validPlaces.map(({ place, coords }) => {
-    const lines = [
-      '  {',
-      `    name: '${place.name}',`,
-      `    lat: ${coords!.lat},`,
-      `    lng: ${coords!.lng},`,
-      `    country: '${place.country || '未知'}',`,
-    ];
-    
-    if (place.firstVisitDate) {
-      lines.push(`    firstVisitDate: '${place.firstVisitDate}',`);
-    }
-    if (place.notes) {
-      lines.push(`    notes: '${place.notes}',`);
-    }
-    
-    lines.push(`    category: '${place.category}',`);
-    lines.push('  }');
-    
-    return lines.join('\n');
-  });
-
-  return `import type { TravelPlace } from '@/types/travel';
-
-/**
- * 个人旅行足迹数据
- * 此文件由工具自动生成，包含地理坐标
- */
-export const travelPlaces: TravelPlace[] = [
-${placesArray.join(',\n')},
-];
-`;
 }

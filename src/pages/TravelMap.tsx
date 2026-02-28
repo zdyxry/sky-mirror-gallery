@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Navigation, Globe, Home, Plane, Loader2 } from 'lucide-react';
-// rawTravelPlaces 会在 useEffect 中动态导入
+import { MapPin, Navigation, Globe, Loader2, Calendar, History } from 'lucide-react';
+import { rawTravelPlaces } from '@/data/travelData';
 import { CATEGORY_COLORS, CATEGORY_LABELS, type TravelCategory, type TravelPlace } from '@/types/travel';
 import { BackgroundEffects } from '@/components/BackgroundEffects';
 import { batchGeocode } from '@/services/geocoding';
@@ -69,6 +69,16 @@ function CategoryFilter({
   );
 }
 
+// 格式化访问记录
+function formatVisits(visits: { year: number; description: string }[]): string {
+  if (visits.length === 0) return '';
+  
+  // 按年份降序排序
+  const sorted = [...visits].sort((a, b) => b.year - a.year);
+  
+  return sorted.map(v => `${v.year}年${v.description ? ` · ${v.description}` : ''}`).join('<br/>');
+}
+
 export default function TravelMap() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Leaflet.Map | null>(null);
@@ -81,12 +91,20 @@ export default function TravelMap() {
 
   const stats = useMemo(() => {
     const countries = new Set(places.map(p => p.country));
+    const allYears = places.flatMap(p => p.visits.map(v => v.year));
+    const totalVisits = allYears.length;
+    
     return {
       totalPlaces: places.length,
+      totalVisits,
       homeCount: places.filter(p => p.category === 'home').length,
       domesticCount: places.filter(p => p.category === 'domestic').length,
       internationalCount: places.filter(p => p.category === 'international').length,
       countries: Array.from(countries),
+      yearRange: {
+        min: allYears.length > 0 ? Math.min(...allYears) : new Date().getFullYear(),
+        max: allYears.length > 0 ? Math.max(...allYears) : new Date().getFullYear(),
+      },
     };
   }, [places]);
 
@@ -106,10 +124,9 @@ export default function TravelMap() {
       // 先尝试从缓存获取
       const { getTravelPlaces } = await import('@/data/travelData');
       const cachedPlaces = getTravelPlaces();
-      const { rawTravelPlaces: rawPlaces } = await import('@/data/travelData');
       
       // 检查是否所有地点都有坐标
-      const placesNeedingCoords = rawPlaces.filter(
+      const placesNeedingCoords = rawTravelPlaces.filter(
         raw => !cachedPlaces.find(cached => cached.name === raw.name && cached.country === raw.country)
       );
 
@@ -160,7 +177,7 @@ export default function TravelMap() {
       const avgLng = places.reduce((sum, p) => sum + p.lng, 0) / places.length;
 
       // 创建地图
-      const map = L.map(mapContainerRef.current!).setView([avgLat, avgLng], 3);
+      const map = L.map(mapContainerRef.current!).setView([avgLat, avgLng], 4);
 
       // 添加地图图层
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -194,22 +211,30 @@ export default function TravelMap() {
         const icon = createMarkerIcon(CATEGORY_COLORS[place.category]);
         const marker = L.marker([place.lat, place.lng], { icon }).addTo(mapRef.current!);
 
-        const dateRow = place.firstVisitDate
-          ? `<div class="flex gap-2 text-sm"><span class="text-muted-foreground">首访：</span><span>${place.firstVisitDate}</span></div>`
+        const visitCount = place.visits.length;
+        const visitsHtml = visitCount > 0 
+          ? `<div class="mt-2 pt-2 border-t border-border/50">
+               <div class="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+                 <History class="w-3 h-3" />
+                 <span>访问记录 (${visitCount}次)</span>
+               </div>
+               <div class="text-xs text-foreground/80">${formatVisits(place.visits)}</div>
+             </div>`
           : '';
-        const notesRow = place.notes
-          ? `<div class="flex gap-2 text-sm"><span class="text-muted-foreground">备注：</span><span>${place.notes}</span></div>`
+        
+        const notesHtml = place.notes
+          ? `<div class="flex gap-2 text-sm mt-2"><span class="text-muted-foreground">备注：</span><span>${place.notes}</span></div>`
           : '';
 
         marker.bindPopup(`
-          <div class="min-w-[180px] p-1">
-            <div class="font-semibold text-base mb-2">${place.name}</div>
-            <div class="flex gap-2 text-sm mb-1">
+          <div class="min-w-[200px] p-1">
+            <div class="font-semibold text-base mb-1">${place.name}</div>
+            <div class="flex gap-2 text-sm mb-2">
               <span class="text-muted-foreground">国家/地区：</span>
               <span>${place.country}</span>
             </div>
-            ${dateRow}
-            ${notesRow}
+            ${notesHtml}
+            ${visitsHtml}
             <div class="mt-3 pt-2 border-t text-xs" style="color:${CATEGORY_COLORS[place.category]}">
               ● ${CATEGORY_LABELS[place.category]}
             </div>
@@ -267,22 +292,29 @@ export default function TravelMap() {
                 </div>
                 <div>
                   <h1 className="text-lg font-semibold text-foreground">旅行足迹</h1>
-                  <p className="text-xs text-muted-foreground">记录走过的每一个角落</p>
+                  <p className="text-xs text-muted-foreground">
+                    {stats.yearRange.min}-{stats.yearRange.max} · 记录走过的每一个角落
+                  </p>
                 </div>
               </div>
 
               {/* Stats */}
               <motion.div 
-                className="flex items-center gap-4 sm:gap-6 text-sm"
+                className="flex items-center gap-4 sm:gap-6 text-sm flex-wrap"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
               >
                 <div className="flex items-center gap-1.5">
                   <MapPin className="w-4 h-4 text-primary" />
-                  <span className="text-muted-foreground">总计</span>
+                  <span className="text-muted-foreground">地点</span>
                   <span className="font-semibold text-foreground">{stats.totalPlaces}</span>
-                  <span className="text-muted-foreground">个地点</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="w-4 h-4 text-primary" />
+                  <span className="text-muted-foreground">访问</span>
+                  <span className="font-semibold text-foreground">{stats.totalVisits}</span>
+                  <span className="text-muted-foreground">次</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Globe className="w-4 h-4 text-primary" />
