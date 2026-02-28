@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { Globe } from 'lucide-react';
 import { useBlueskyProfile, useBlueskyFeed } from '@/hooks/useBlueskyFeed';
 import { ProfileHeader } from '@/components/ProfileHeader';
 import { FilterTabs } from '@/components/FilterTabs';
@@ -59,8 +60,37 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <BackgroundEffects />
+
+      {/* Header Navigation */}
+      <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-14">
+            {/* Logo */}
+            <a href="/" className="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
+              <Globe className="w-5 h-5" />
+              <span className="font-semibold">Decaocto</span>
+            </a>
+
+            {/* Navigation */}
+            <nav className="flex items-center gap-1">
+              <a
+                href="/"
+                className="px-3 py-1.5 text-sm font-medium text-foreground bg-accent rounded-md"
+              >
+                动态
+              </a>
+              <a
+                href="/travel"
+                className="px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground rounded-md hover:bg-accent transition-colors"
+              >
+                足迹
+              </a>
+            </nav>
+          </div>
+        </div>
+      </header>
       
-      {/* Header */}
+      {/* Profile Header */}
       <ProfileHeader profile={profile} isLoading={profileLoading} />
 
       {/* Main Content */}
