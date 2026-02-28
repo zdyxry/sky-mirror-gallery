@@ -213,29 +213,29 @@ export default function TravelMap() {
 
         const visitCount = place.visits.length;
         const visitsHtml = visitCount > 0 
-          ? `<div class="mt-2 pt-2 border-t border-border/50">
-               <div class="flex items-center gap-1 text-xs text-muted-foreground mb-1">
-                 <History class="w-3 h-3" />
+          ? `<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,0.1);">
+               <div style="display: flex; align-items: center; gap: 4px; font-size: 12px; color: #666; margin-bottom: 4px;">
+                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
                  <span>访问记录 (${visitCount}次)</span>
                </div>
-               <div class="text-xs text-foreground/80">${formatVisits(place.visits)}</div>
+               <div style="font-size: 12px; color: #333;">${formatVisits(place.visits)}</div>
              </div>`
           : '';
         
         const notesHtml = place.notes
-          ? `<div class="flex gap-2 text-sm mt-2"><span class="text-muted-foreground">备注：</span><span>${place.notes}</span></div>`
+          ? `<div style="display: flex; gap: 8px; font-size: 14px; margin-top: 8px;"><span style="color: #666;">备注：</span><span>${place.notes}</span></div>`
           : '';
 
         marker.bindPopup(`
-          <div class="min-w-[200px] p-1">
-            <div class="font-semibold text-base mb-1">${place.name}</div>
-            <div class="flex gap-2 text-sm mb-2">
-              <span class="text-muted-foreground">国家/地区：</span>
+          <div style="min-width: 200px; padding: 4px;">
+            <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">${place.name}</div>
+            <div style="display: flex; gap: 8px; font-size: 14px; margin-bottom: 8px;">
+              <span style="color: #666;">国家/地区：</span>
               <span>${place.country}</span>
             </div>
             ${notesHtml}
             ${visitsHtml}
-            <div class="mt-3 pt-2 border-t text-xs" style="color:${CATEGORY_COLORS[place.category]}">
+            <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,0.1); font-size: 12px; color: ${CATEGORY_COLORS[place.category]};">
               ● ${CATEGORY_LABELS[place.category]}
             </div>
           </div>
