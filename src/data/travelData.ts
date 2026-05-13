@@ -196,7 +196,9 @@ export const rawTravelPlaces: RawTravelPlace[] = [
     country: '中国',
     category: 'domestic',
     visits: [
+      { year: 2025, month: 9, description: '旅行' },
       { year: 2024, description: '旅行' },
+      { year: 2023, month: 10, description: '旅行' },
     ],
   },
   {
