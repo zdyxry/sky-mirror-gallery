@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Navigation, Globe, Loader2, Calendar, History } from 'lucide-react';
+import { MapPin, Navigation, Globe, Loader2, Calendar, History, Flame } from 'lucide-react';
 import { rawTravelPlaces } from '@/data/travelData';
 import { CATEGORY_COLORS, CATEGORY_LABELS, type TravelCategory, type TravelPlace } from '@/types/travel';
 import { BackgroundEffects } from '@/components/BackgroundEffects';
@@ -89,7 +89,10 @@ export default function TravelMap() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Leaflet.Map | null>(null);
   const markersRef = useRef<Leaflet.Marker[]>([]);
+  const heatLayerRef = useRef<Leaflet.Layer | null>(null);
+  const leafletRef = useRef<typeof import('leaflet') | null>(null);
   const [activeCategory, setActiveCategory] = useState<TravelCategory | 'all'>('all');
+  const [showHeatmap, setShowHeatmap] = useState(false);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [places, setPlaces] = useState<TravelPlace[]>([]);
   const [isLoadingCoords, setIsLoadingCoords] = useState(true);
@@ -177,7 +180,11 @@ export default function TravelMap() {
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current || places.length === 0) return;
 
-    import('leaflet').then((L) => {
+    import('leaflet').then((LModule) => {
+      // Cache leaflet module so we don't re-import on every toggle
+      leafletRef.current = LModule;
+      // leaflet.heat expects L to be global
+      (window as unknown as Record<string, unknown>).L = LModule;
       // 计算地图中心点（所有地点的平均值）
       const avgLat = places.reduce((sum, p) => sum + p.lat, 0) / places.length;
       const avgLng = places.reduce((sum, p) => sum + p.lng, 0) / places.length;
@@ -203,14 +210,45 @@ export default function TravelMap() {
     };
   }, [places]);
 
-  // 更新标记
+  // 计算热力图强度（基于访问次数）
+  const getHeatIntensity = (visitCount: number): number => {
+    if (visitCount === 0) return 0.25;
+    if (visitCount === 1) return 0.4;
+    if (visitCount === 2) return 0.6;
+    if (visitCount === 3) return 0.8;
+    return 1.0;
+  };
+
+  // 更新标记和热力图
   useEffect(() => {
     if (!mapRef.current || !isMapLoaded) return;
 
-    import('leaflet').then((L) => {
+    let cancelled = false;
+
+    async function updateMap() {
+      // Cache leaflet module so window.L stays the same object across toggles
+      let L = leafletRef.current;
+      if (!L) {
+        L = await import('leaflet');
+        leafletRef.current = L;
+        (window as unknown as Record<string, unknown>).L = L;
+      }
+
+      if (showHeatmap && !('heatLayer' in L)) {
+        await import('leaflet.heat');
+      }
+
+      if (cancelled) return;
+
       // 清除现有标记
       markersRef.current.forEach(marker => marker.remove());
       markersRef.current = [];
+
+      // 清除现有热力图
+      if (heatLayerRef.current) {
+        heatLayerRef.current.remove();
+        heatLayerRef.current = null;
+      }
 
       // 添加新标记
       filteredPlaces.forEach((place) => {
@@ -249,8 +287,41 @@ export default function TravelMap() {
 
         markersRef.current.push(marker);
       });
-    });
-  }, [filteredPlaces, isMapLoaded]);
+
+      // 添加热力图
+      if (showHeatmap && filteredPlaces.length > 0) {
+        const heatData: [number, number, number][] = filteredPlaces.map((place) => [
+          place.lat,
+          place.lng,
+          getHeatIntensity(place.visits.length),
+        ]);
+
+        // @ts-expect-error leaflet.heat is not in standard leaflet types
+        const heatLayer = L.heatLayer(heatData, {
+          radius: 35,
+          blur: 25,
+          maxZoom: 10,
+          max: 1.0,
+          minOpacity: 0.3,
+          gradient: {
+            0.0: '#3b82f6',
+            0.25: '#06b6d4',
+            0.5: '#22c55e',
+            0.75: '#eab308',
+            1.0: '#ef4444',
+          },
+        }).addTo(mapRef.current!);
+
+        heatLayerRef.current = heatLayer;
+      }
+    }
+
+    updateMap();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [filteredPlaces, isMapLoaded, showHeatmap]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -370,6 +441,25 @@ export default function TravelMap() {
                 isActive={activeCategory === 'international'}
                 onClick={() => setActiveCategory('international')}
               />
+
+              <div className="w-px h-6 bg-border mx-1" />
+
+              {/* Heatmap Toggle */}
+              <button
+                onClick={() => setShowHeatmap(!showHeatmap)}
+                className={`
+                  flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium
+                  transition-all duration-200 border
+                  ${showHeatmap 
+                    ? 'bg-orange-500 text-white border-orange-500 shadow-sm' 
+                    : 'bg-background/80 text-muted-foreground border-border hover:border-orange-300 hover:text-foreground'
+                  }
+                `}
+                title="按访问次数显示热力图"
+              >
+                <Flame className="w-3.5 h-3.5" />
+                <span>热力图</span>
+              </button>
             </motion.div>
           </div>
         </div>
@@ -402,6 +492,7 @@ export default function TravelMap() {
           )}
 
           {/* Legend */}
+          {/* Legend */}
           <motion.div 
             className="absolute bottom-4 left-4 bg-background/90 backdrop-blur-sm rounded-lg border border-border p-3 shadow-lg"
             initial={{ opacity: 0, x: -20 }}
@@ -423,6 +514,25 @@ export default function TravelMap() {
                 <span>{CATEGORY_LABELS.international}</span>
               </div>
             </div>
+            {showHeatmap && (
+              <div className="mt-3 pt-3 border-t border-border">
+                <div className="text-xs font-medium text-muted-foreground mb-2">热力强度（访问次数）</div>
+                <div className="flex items-center gap-1 h-3 rounded-full overflow-hidden">
+                  <div className="flex-1 h-full bg-blue-500" />
+                  <div className="flex-1 h-full bg-cyan-500" />
+                  <div className="flex-1 h-full bg-green-500" />
+                  <div className="flex-1 h-full bg-yellow-500" />
+                  <div className="flex-1 h-full bg-red-500" />
+                </div>
+                <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+                  <span>0次</span>
+                  <span>1次</span>
+                  <span>2次</span>
+                  <span>3次</span>
+                  <span>4次+</span>
+                </div>
+              </div>
+            )}
           </motion.div>
         </div>
       </main>
