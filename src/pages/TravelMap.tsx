@@ -181,10 +181,12 @@ export default function TravelMap() {
     if (!mapContainerRef.current || mapRef.current || places.length === 0) return;
 
     import('leaflet').then((LModule) => {
+      // Use the actual L object instead of the frozen ES module namespace
+      const L = (LModule as any).default || LModule;
       // Cache leaflet module so we don't re-import on every toggle
-      leafletRef.current = LModule;
+      leafletRef.current = L;
       // leaflet.heat expects L to be global
-      (window as unknown as Record<string, unknown>).L = LModule;
+      (window as unknown as Record<string, unknown>).L = L;
       // 计算地图中心点（所有地点的平均值）
       const avgLat = places.reduce((sum, p) => sum + p.lat, 0) / places.length;
       const avgLng = places.reduce((sum, p) => sum + p.lng, 0) / places.length;
@@ -229,7 +231,8 @@ export default function TravelMap() {
       // Cache leaflet module so window.L stays the same object across toggles
       let L = leafletRef.current;
       if (!L) {
-        L = await import('leaflet');
+        const LModule = await import('leaflet');
+        L = (LModule as any).default || LModule;
         leafletRef.current = L;
         (window as unknown as Record<string, unknown>).L = L;
       }
