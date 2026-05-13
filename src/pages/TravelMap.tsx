@@ -70,13 +70,19 @@ function CategoryFilter({
 }
 
 // 格式化访问记录
-function formatVisits(visits: { year: number; description: string }[]): string {
+function formatVisits(visits: { year: number; month?: number; description: string }[]): string {
   if (visits.length === 0) return '';
   
-  // 按年份降序排序
-  const sorted = [...visits].sort((a, b) => b.year - a.year);
+  // 按年份降序，同年按月份降序
+  const sorted = [...visits].sort((a, b) => {
+    if (b.year !== a.year) return b.year - a.year;
+    return (b.month ?? 0) - (a.month ?? 0);
+  });
   
-  return sorted.map(v => `${v.year}年${v.description ? ` · ${v.description}` : ''}`).join('<br/>');
+  return sorted.map(v => {
+    const monthStr = v.month ? `${v.month}月` : '';
+    return `${v.year}年${monthStr}${v.description ? ` · ${v.description}` : ''}`;
+  }).join('<br/>');
 }
 
 export default function TravelMap() {

@@ -5,6 +5,8 @@ export type TravelCategory = 'home' | 'domestic' | 'international';
 export interface TravelVisit {
   /** 访问年份 */
   year: number;
+  /** 访问月份（1-12，可选） */
+  month?: number;
   /** 访问描述/原因 */
   description: string;
 }

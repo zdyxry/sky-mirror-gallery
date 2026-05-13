@@ -28,6 +28,7 @@ export const rawTravelPlaces: RawTravelPlace[] = [
     country: '中国',
     category: 'home',
     visits: [
+      { year: 2026, month: 5, description: '探亲' },
       { year: 2025, description: '探亲' },
       { year: 2024, description: '探亲' },
     ],
@@ -58,6 +59,7 @@ export const rawTravelPlaces: RawTravelPlace[] = [
     country: '中国',
     category: 'domestic',
     visits: [
+      { year: 2026, month: 5, description: '出差' },
       { year: 2026, description: '出差' },
       { year: 2024, description: '出差' },
     ],
@@ -71,6 +73,33 @@ export const rawTravelPlaces: RawTravelPlace[] = [
     ],
     notes: '津门故里，相声之乡',
   },
+  {
+    name: '苏州',
+    country: '中国',
+    category: 'domestic',
+    visits: [
+      { year: 2026, month: 5, description: '旅游' },
+    ],
+    notes: '园林之城，江南水乡',
+  },
+  {
+    name: '无锡',
+    country: '中国',
+    category: 'domestic',
+    visits: [
+      { year: 2026, month: 5, description: '旅游' },
+    ],
+    notes: '太湖明珠，江南盛地',
+  },
+  {
+    name: '宜春',
+    country: '中国',
+    category: 'domestic',
+    visits: [
+      { year: 2026, month: 5, description: '经停' },
+    ],
+    notes: '温泉之都，月亮之城',
+  },
 
   // 2025
   {
@@ -78,6 +107,8 @@ export const rawTravelPlaces: RawTravelPlace[] = [
     country: '中国',
     category: 'domestic',
     visits: [
+      { year: 2026, month: 4, description: '出差' },
+      { year: 2026, description: '出差' },
       { year: 2025, description: '出差' },
       { year: 2024, description: '出差' },
     ],
@@ -386,6 +417,9 @@ const coordinateCache: Record<string, { lat: number; lng: number }> = {
   '湛江-中国': { lat: 21.2737, lng: 110.3548 },
   '东莞-中国': { lat: 23.0184, lng: 113.7452 },
   '天津-中国': { lat: 39.3033, lng: 117.4164 },
+  '苏州-中国': { lat: 31.2989, lng: 120.5853 },
+  '无锡-中国': { lat: 31.5689, lng: 120.2990 },
+  '宜春-中国': { lat: 27.8158, lng: 114.4168 },
   '河源-中国': { lat: 23.7468, lng: 114.6954 },
   '江门-中国': { lat: 22.5817, lng: 113.0761 },
   '成都-中国': { lat: 30.6599, lng: 104.0633 },
