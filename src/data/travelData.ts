@@ -70,6 +70,7 @@ export const rawTravelPlaces: RawTravelPlace[] = [
     category: 'domestic',
     visits: [
       { year: 2026, description: '探亲' },
+      { year: 2016, description: '探亲' },
     ],
     notes: '津门故里，相声之乡',
   },
@@ -119,6 +120,7 @@ export const rawTravelPlaces: RawTravelPlace[] = [
     category: 'domestic',
     visits: [
       { year: 2025, description: '出差' },
+      { year: 2023, month: 10, description: '旅游' },
     ],
   },
   {
@@ -145,6 +147,8 @@ export const rawTravelPlaces: RawTravelPlace[] = [
     visits: [
       { year: 2025, description: '出差' },
       { year: 2024, description: '演唱会、出差' },
+      { year: 2023, description: '出差' },
+      { year: 2022, description: '出差' },
     ],
   },
   {
@@ -189,6 +193,7 @@ export const rawTravelPlaces: RawTravelPlace[] = [
     category: 'domestic',
     visits: [
       { year: 2024, description: '出差' },
+      { year: 2023, month: 9, description: '出差' },
     ],
   },
   {
@@ -239,7 +244,11 @@ export const rawTravelPlaces: RawTravelPlace[] = [
     country: '中国',
     category: 'domestic',
     visits: [
+      { year: 2026, description: '旅行' },
+      { year: 2025, description: '旅行' },
       { year: 2024, description: '旅行' },
+      { year: 2023, description: '旅行' },
+      { year: 2022, description: '旅行' },
     ],
   },
   {
@@ -258,6 +267,7 @@ export const rawTravelPlaces: RawTravelPlace[] = [
     country: '中国',
     category: 'domestic',
     visits: [
+      { year: 2018, description: '旅行' },
       { year: 2016, description: '旅行' },
     ],
   },
@@ -266,6 +276,7 @@ export const rawTravelPlaces: RawTravelPlace[] = [
     country: '中国',
     category: 'domestic',
     visits: [
+      { year: 2023, description: '出差' },
       { year: 2017, description: '旅行' },
     ],
   },
@@ -298,8 +309,13 @@ export const rawTravelPlaces: RawTravelPlace[] = [
     country: '中国',
     category: 'domestic',
     visits: [
-      { year: 2019, description: '旅行' },
+      { year: 2023, description: '出差、旅游' },
       { year: 2020, description: '旅行' },
+      { year: 2019, description: '旅行' },
+      { year: 2016, description: '求职' },
+      { year: 2014, description: '旅行' },
+      { year: 2013, description: '旅行' },
+      { year: 2009, description: '旅行' },
     ],
   },
   {
