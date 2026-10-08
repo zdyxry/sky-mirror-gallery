@@ -225,6 +225,15 @@ export const rawTravelPlaces: RawTravelPlace[] = [
     ],
   },
   {
+    name: '凭祥',
+    country: '中国',
+    category: 'domestic',
+    visits: [
+      { year: 2026, month: 10, description: '旅行' },
+    ],
+    notes: '中越边境，友谊关口岸',
+  },
+  {
     name: '惠来',
     country: '中国',
     category: 'domestic',
@@ -497,6 +506,7 @@ const coordinateCache: Record<string, { lat: number; lng: number }> = {
   '香港-中国': { lat: 22.2793, lng: 114.1629 },
   '汕头-中国': { lat: 23.3564, lng: 116.6776 },
   '南宁-中国': { lat: 22.8193, lng: 108.3627 },
+  '凭祥-中国': { lat: 22.1081, lng: 106.7597 },
   '惠来-中国': { lat: 23.0326, lng: 116.2257 },
   '长沙-中国': { lat: 28.1988, lng: 112.9709 },
   '佛山-中国': { lat: 23.0240, lng: 113.1160 },
