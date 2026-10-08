@@ -220,6 +220,7 @@ export const rawTravelPlaces: RawTravelPlace[] = [
     country: '中国',
     category: 'domestic',
     visits: [
+      { year: 2026, month: 10, description: '旅行' },
       { year: 2024, description: '出差' },
     ],
   },
@@ -422,6 +423,51 @@ export const rawTravelPlaces: RawTravelPlace[] = [
     ],
     notes: '微笑之国，寺庙林立',
   },
+  {
+    name: '胡志明市',
+    country: '越南',
+    category: 'international',
+    visits: [
+      { year: 2026, month: 9, description: '旅行' },
+    ],
+    notes: '越南第一大城市',
+  },
+  {
+    name: '岘港',
+    country: '越南',
+    category: 'international',
+    visits: [
+      { year: 2026, month: 9, description: '旅行' },
+    ],
+    notes: '海滨城市，美溪海滩',
+  },
+  {
+    name: '会安',
+    country: '越南',
+    category: 'international',
+    visits: [
+      { year: 2026, month: 9, description: '旅行' },
+    ],
+    notes: '灯笼古城，世界文化遗产',
+  },
+  {
+    name: '顺化',
+    country: '越南',
+    category: 'international',
+    visits: [
+      { year: 2026, month: 9, description: '旅行' },
+    ],
+    notes: '越南古都，顺化皇城',
+  },
+  {
+    name: '河内',
+    country: '越南',
+    category: 'international',
+    visits: [
+      { year: 2026, month: 10, description: '旅行' },
+    ],
+    notes: '越南首都，千年古都',
+  },
 ];
 
 /**
@@ -473,6 +519,11 @@ const coordinateCache: Record<string, { lat: number; lng: number }> = {
   '摩洛哥-摩洛哥': { lat: 28.3348, lng: -10.3713 },
   '新加坡-新加坡': { lat: 1.2899, lng: 103.8519 },
   '曼谷-泰国': { lat: 13.7525, lng: 100.4935 },
+  '胡志明市-越南': { lat: 10.7626, lng: 106.6602 },
+  '岘港-越南': { lat: 16.0544, lng: 108.2022 },
+  '会安-越南': { lat: 15.8801, lng: 108.3381 },
+  '顺化-越南': { lat: 16.4637, lng: 107.5909 },
+  '河内-越南': { lat: 21.0278, lng: 105.8342 },
 };
 
 /**
